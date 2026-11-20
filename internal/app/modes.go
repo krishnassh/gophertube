@@ -8,19 +8,19 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/urfave/cli/v3"
 )
 
 // sanitizeFilename converts a video title into a filesystem-safe filename.
 func sanitizeFilename(s string) string {
-	s = strings.ReplaceAll(s, " ", "_")
-	allowed := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-"
 	return strings.Map(func(r rune) rune {
-		if strings.ContainsRune(allowed, r) {
-			return r
+		if unicode.IsSpace(r) ||
+			unicode.IsControl(r) || strings.ContainsRune(`/\:*?"<>|`, r) {	// for safe filename cross-platform
+			return '_'
 		}
-		return '_'
+		return r
 	}, s)
 }
 
